@@ -7,6 +7,7 @@ import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import org.openqa.selenium.*;
+import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -25,19 +26,20 @@ public class SentimentAnalysisSteps {
     private WebDriver driver;
 
     /**
-     * Setup the firefow test driver. This needs the environment variable 'webdriver.gecko.driver'
+     * Setup the firefox test driver. This needs the environment variable 'webdriver.gecko.driver'
      * with the path to the geckodriver binary
      */
     @Before
     public void before(Scenario scenario) throws Exception {
-        DesiredCapabilities capabilities = DesiredCapabilities.firefox();
-        capabilities.setCapability("version", "latest");
-        capabilities.setCapability("platform", Platform.LINUX);
-        capabilities.setCapability("name", scenario.getName());
+//        DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+//        capabilities.setCapability("version", "latest");
+//        capabilities.setCapability("platform", Platform.LINUX);
+//        capabilities.setCapability("name", scenario.getName());
 
-        driver = new RemoteWebDriver(
-                new URL("http://"+System.getenv("TESTINGBOT_CREDENTIALS")+"@hub.testingbot.com/wd/hub"),
-                capabilities);
+//        driver = new RemoteWebDriver(
+//                new URL("http://"+System.getenv("TESTINGBOT_CREDENTIALS")+"@hub.testingbot.com/wd/hub"),
+//                capabilities);
+        driver = new FirefoxDriver();
 
         // prevent errors if we start from a sleeping heroku instance
         driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
@@ -70,7 +72,6 @@ public class SentimentAnalysisSteps {
         textField.sendKeys(text);
 
         WebDriverWait wait = new WebDriverWait(driver, 10);
-        ;
         WebElement button = wait.until(ExpectedConditions.elementToBeClickable(By.id("analyzeBtn")));
         button.click();
 
