@@ -1,7 +1,7 @@
 Feature: Automated User Acceptance Tests for the Sentiment Analysis Application
 
   Background:
-    Given Open https://fhv-cicd-staging.herokuapp.com/
+    Given Open https://fhv-application-staging.herokuapp.com/
 
   Scenario: Test login and logout
     Given Login with user 'user@test.com'
