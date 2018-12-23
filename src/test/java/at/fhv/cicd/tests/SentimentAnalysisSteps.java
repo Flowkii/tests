@@ -31,15 +31,14 @@ public class SentimentAnalysisSteps {
      */
     @Before
     public void before(Scenario scenario) throws Exception {
-//        DesiredCapabilities capabilities = DesiredCapabilities.firefox();
-//        capabilities.setCapability("version", "latest");
-//        capabilities.setCapability("platform", Platform.LINUX);
-//        capabilities.setCapability("name", scenario.getName());
+        DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+        capabilities.setCapability("version", "latest");
+        capabilities.setCapability("platform", Platform.LINUX);
+        capabilities.setCapability("name", scenario.getName());
 
-//        driver = new RemoteWebDriver(
-//                new URL("http://"+System.getenv("TESTINGBOT_CREDENTIALS")+"@hub.testingbot.com/wd/hub"),
-//                capabilities);
-        driver = new FirefoxDriver();
+        driver = new RemoteWebDriver(
+                new URL("http://"+System.getenv("TESTINGBOT_CREDENTIALS")+"@hub.testingbot.com/wd/hub"),
+                capabilities);
 
         // prevent errors if we start from a sleeping heroku instance
         driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
