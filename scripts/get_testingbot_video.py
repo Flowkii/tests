@@ -11,7 +11,7 @@ for i in range(0, 10):
 
     # get the video link of the latest test with the name "User interaction with history"
     for test in response['data']:
-        if test['name'] == 'User interaction with history' and test['state'] == 'COMPLETE':
+        if test['name'] == 'User interaction with history (video)' and test['state'] == 'COMPLETE':
             if not test['assets_available']:
                 # wait 5 seconds if the asset is not available and try again
                 time.sleep(5)
