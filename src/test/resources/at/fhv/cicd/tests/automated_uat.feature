@@ -26,7 +26,7 @@ Feature: Automated User Acceptance Tests for the Sentiment Analysis Application
     Then The smiley should be neutral
     And I press logout
 
-  Scenario: User interaction with history
+  Scenario: User interaction with history (video)
     Given Login with user 'user@test.com'
     When Analyze the text 'I love people'
     And Analyze the text 'I hate people'

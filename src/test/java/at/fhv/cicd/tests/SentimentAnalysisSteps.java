@@ -22,117 +22,120 @@ import static org.junit.Assert.*;
  */
 public class SentimentAnalysisSteps {
 
-    private WebDriver driver;
+	private WebDriver driver;
 
-    /**
-     * Setup the firefox test driver. This needs the environment variable 'webdriver.gecko.driver'
-     * with the path to the geckodriver binary
-     */
-    @Before
-    public void before(Scenario scenario) throws Exception {
-    	DesiredCapabilities capabilities = new DesiredCapabilities();
-    	capabilities.setCapability("platform", "WIN10");
-    	capabilities.setCapability("version", "64");
-    	capabilities.setCapability("browserName", "firefox");
+	/**
+	 * Setup the firefox test driver. This needs the environment variable
+	 * 'webdriver.gecko.driver' with the path to the geckodriver binary
+	 */
+	@Before
+	public void before(Scenario scenario) throws Exception {
+		DesiredCapabilities capabilities = new DesiredCapabilities();
+		capabilities.setCapability("platform", "WIN10");
+		capabilities.setCapability("version", "64");
+		capabilities.setCapability("browserName", "firefox");
+		capabilities.setCapability("name", scenario.getName());
 
-        driver = new RemoteWebDriver(
-                new URL("http://"+System.getenv("TESTINGBOT_CREDENTIALS")+"@hub.testingbot.com/wd/hub"),
-                capabilities);
+		if (!scenario.getName().endsWith("(video)")) {
+			capabilities.setCapability("headless", true);
+		}
 
-        // prevent errors if we start from a sleeping heroku instance
-        driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
-    }
+		driver = new RemoteWebDriver(
+				new URL("http://" + System.getenv("TESTINGBOT_CREDENTIALS") + "@hub.testingbot.com/wd/hub"),
+				capabilities);
 
-    /**
-     * Shutdown the driver
-     */
-    @After
-    public void after() {
-        driver.quit();
-    }
+		// prevent errors if we start from a sleeping heroku instance
+		driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+	}
 
-    @Given("^Open (.*?)$")
-    public void openUrl(String url) {
-        driver.navigate().to(url);
-    }
+	/**
+	 * Shutdown the driver
+	 */
+	@After
+	public void after() {
+		driver.quit();
+	}
 
-    @Given("^Login with user '(.*?)'$")
-    public void login(String email) {
-        WebElement emailField = driver.findElement(By.id("email"));
-        emailField.sendKeys(email);
-        driver.findElement(By.id("loginBtn")).click();
-    }
+	@Given("^Open (.*?)$")
+	public void openUrl(String url) {
+		driver.navigate().to(url);
+	}
 
-    @When("^Analyze the text '(.*?)'$")
-    public void analyzeText(String text) {
-        WebElement textField = driver.findElement(By.id("analyzeText"));
-        textField.clear();
-        textField.sendKeys(text);
+	@Given("^Login with user '(.*?)'$")
+	public void login(String email) {
+		WebElement emailField = driver.findElement(By.id("email"));
+		emailField.sendKeys(email);
+		driver.findElement(By.id("loginBtn")).click();
+	}
 
-        WebDriverWait wait = new WebDriverWait(driver, 10);
-        WebElement button = wait.until(ExpectedConditions.elementToBeClickable(By.id("analyzeBtn")));
-        button.click();
+	@When("^Analyze the text '(.*?)'$")
+	public void analyzeText(String text) {
+		WebElement textField = driver.findElement(By.id("analyzeText"));
+		textField.clear();
+		textField.sendKeys(text);
 
-    }
+		WebDriverWait wait = new WebDriverWait(driver, 10);
+		WebElement button = wait.until(ExpectedConditions.elementToBeClickable(By.id("analyzeBtn")));
+		button.click();
 
-    @Then("^The smiley should be (.*?)$")
-    // wait until the result has been received
-    public void checkSentiment(String sentiment) {
-        WebDriverWait wait = new WebDriverWait(driver, 10);
-        wait.until(ExpectedConditions.elementToBeClickable(By.id("analyzeBtn")));
+	}
 
-        WebElement sentimentItem = driver.findElement(By.id("sentiment"));
-        verifySentiment(sentimentItem, sentiment);
-    }
+	@Then("^The smiley should be (.*?)$")
+	// wait until the result has been received
+	public void checkSentiment(String sentiment) {
+		WebDriverWait wait = new WebDriverWait(driver, 10);
+		wait.until(ExpectedConditions.elementToBeClickable(By.id("analyzeBtn")));
 
-    @When("^I press logout$")
-    public void logout() {
-        WebDriverWait wait = new WebDriverWait(driver, 10);
-        WebElement logoutLink = wait.until(
-                ExpectedConditions.elementToBeClickable(By.id("logoutLink")));
-        logoutLink.click();
+		WebElement sentimentItem = driver.findElement(By.id("sentiment"));
+		verifySentiment(sentimentItem, sentiment);
+	}
 
-        // wait until popup is visible
-        WebElement logoutBtn = wait.until(
-                ExpectedConditions.elementToBeClickable(By.id("logoutBtn")));
-        logoutBtn.click();
-    }
+	@When("^I press logout$")
+	public void logout() {
+		WebDriverWait wait = new WebDriverWait(driver, 10);
+		WebElement logoutLink = wait.until(ExpectedConditions.elementToBeClickable(By.id("logoutLink")));
+		logoutLink.click();
 
-    @Then("^I see the login page$")
-    public void checkLoginPage() {
-        assertFalse(driver.findElements(By.id("logo")).isEmpty());
-    }
+		// wait until popup is visible
+		WebElement logoutBtn = wait.until(ExpectedConditions.elementToBeClickable(By.id("logoutBtn")));
+		logoutBtn.click();
+	}
 
-    @When("^Navigate to history$")
-    public void navigateToHistory() {
-        driver.findElement(By.linkText("History")).click();
-    }
+	@Then("^I see the login page$")
+	public void checkLoginPage() {
+		assertFalse(driver.findElements(By.id("logo")).isEmpty());
+	}
 
-    @Then("^The ([0-9]). row shows the history item with text '(.*?)' and sentiment is '(.*?)'")
-    public void checkHistoryItem(int row, String text, String sentiment) {
-        WebElement textCell = driver.findElement(By.xpath("//table/tbody/tr[" + row + "]/td[1]"));
-        WebElement sentimentIcon = driver.findElement(By.xpath("//table/tbody/tr[" + row + "]/td[2]/i"));
+	@When("^Navigate to history$")
+	public void navigateToHistory() {
+		driver.findElement(By.linkText("History")).click();
+	}
 
-        assertEquals(text, textCell.getText());
-        verifySentiment(sentimentIcon, sentiment);
-    }
+	@Then("^The ([0-9]). row shows the history item with text '(.*?)' and sentiment is '(.*?)'")
+	public void checkHistoryItem(int row, String text, String sentiment) {
+		WebElement textCell = driver.findElement(By.xpath("//table/tbody/tr[" + row + "]/td[1]"));
+		WebElement sentimentIcon = driver.findElement(By.xpath("//table/tbody/tr[" + row + "]/td[2]/i"));
 
-    /**
-     * Check if the given icon contains the given sentiment
-     *
-     * @param sentimentIcon The icon to check
-     * @param sentiment     The sentiment which should be set in the icon
-     */
-    private void verifySentiment(WebElement sentimentIcon, String sentiment) {
-        String classes = sentimentIcon.getAttribute("class");
-        if ("happy".equals(sentiment)) {
-            assertTrue(classes.contains("smile"));
-        } else if ("unhappy".equals(sentiment)) {
-            assertTrue(classes.contains("frown"));
-        } else if ("neutral".equals(sentiment)) {
-            assertTrue(classes.contains("meh"));
-        } else {
-            fail();
-        }
-    }
+		assertEquals(text, textCell.getText());
+		verifySentiment(sentimentIcon, sentiment);
+	}
+
+	/**
+	 * Check if the given icon contains the given sentiment
+	 *
+	 * @param sentimentIcon The icon to check
+	 * @param sentiment     The sentiment which should be set in the icon
+	 */
+	private void verifySentiment(WebElement sentimentIcon, String sentiment) {
+		String classes = sentimentIcon.getAttribute("class");
+		if ("happy".equals(sentiment)) {
+			assertTrue(classes.contains("smile"));
+		} else if ("unhappy".equals(sentiment)) {
+			assertTrue(classes.contains("frown"));
+		} else if ("neutral".equals(sentiment)) {
+			assertTrue(classes.contains("meh"));
+		} else {
+			fail();
+		}
+	}
 }
