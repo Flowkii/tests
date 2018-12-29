@@ -7,7 +7,6 @@ import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import org.openqa.selenium.*;
-import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -31,10 +30,10 @@ public class SentimentAnalysisSteps {
      */
     @Before
     public void before(Scenario scenario) throws Exception {
-        DesiredCapabilities capabilities = DesiredCapabilities.firefox();
-        capabilities.setCapability("version", "latest");
-        capabilities.setCapability("platform", Platform.LINUX);
-        capabilities.setCapability("name", scenario.getName());
+    	DesiredCapabilities capabilities = new DesiredCapabilities();
+    	capabilities.setCapability("platform", "WIN10");
+    	capabilities.setCapability("version", "64");
+    	capabilities.setCapability("browserName", "firefox");
 
         driver = new RemoteWebDriver(
                 new URL("http://"+System.getenv("TESTINGBOT_CREDENTIALS")+"@hub.testingbot.com/wd/hub"),
